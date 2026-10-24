@@ -20,4 +20,4 @@ export const COLORES_OPCIONES = [
   COLORES.amarillo,
 ];
 
-export const TIEMPO_POR_PREGUNTA = 10; // segundos
+export const TIEMPO_POR_PREGUNTA = 15; // segundos
