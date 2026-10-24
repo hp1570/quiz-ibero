@@ -58,7 +58,7 @@ Cada rama es el estado exacto de la app al terminar un checkpoint de la práctic
 | `cp1-inicio` | Pantalla de inicio | `PantallaInicio.js`, `App.js` |
 | `cp2-pregunta` | Una pregunta con 4 respuestas; "Jugar" cambia de pantalla | `BotonRespuesta.js`, `Pregunta.js`, `PantallaJuego.js`, `App.js` |
 | `cp3-flujo` | Todas las preguntas, puntaje y pantalla final. **Cada compañero agrega una pregunta** | `PantallaJuego.js`, `PantallaFinal.js`, `App.js`, `preguntas.js` |
-| `cp4-tiempo` | 10 s por pregunta, puntos por rapidez y rachas | `PantallaJuego.js` |
+| `cp4-tiempo` | 15 s por pregunta, puntos por rapidez y rachas | `PantallaJuego.js` |
 | `cp5-animacion` | Aviso animado y sombra distinta por plataforma | `PantallaJuego.js`, `Pregunta.js` |
 | `cp6-record` | Récord cifrado y resumen con FlatList | `record.js`, `PantallaFinal.js`, `PantallaInicio.js`, `package.json` |
 | `cp7-ios` | Indica la plataforma; se prueba en iOS | `PantallaInicio.js` |
