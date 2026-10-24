@@ -1,9 +1,9 @@
-// Pantalla de juego, versión del checkpoint 4.
-// Agrega tiempo por pregunta, puntos por rapidez y rachas.
-// Conceptos: useEffect, arreglo de dependencias y limpieza de efectos.
+// Pantalla de juego.
+// CP4: tiempo por pregunta, puntos por rapidez y rachas (useEffect y limpieza).
+// CP5: animación de acierto/error con Animated y native driver.
 
-import { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
 import Pregunta from './Pregunta';
 import { PREGUNTAS } from '../data/preguntas';
 import { COLORES, TIEMPO_POR_PREGUNTA } from '../theme';
@@ -36,6 +36,21 @@ export default function PantallaJuego({ onTerminar }) {
     if (!respondida && segundos <= 0) responder(TIEMPO_AGOTADO);
   }, [segundos]);
 
+  // CP5: valor animado de 0 a 1 para el aviso de acierto/error.
+  // useNativeDriver: true manda la animación al hilo nativo, así no depende de JavaScript.
+  const aparicion = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!respondida) {
+      aparicion.setValue(0);
+      return;
+    }
+    Animated.spring(aparicion, {
+      toValue: 1,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+  }, [respondida]);
+
   function responder(opcion) {
     if (respondida) return;
     const acierto = opcion === pregunta.correcta;
@@ -58,6 +73,15 @@ export default function PantallaJuego({ onTerminar }) {
     setIndice((i) => i + 1);
     setSeleccion(null);
     setSegundos(TIEMPO_POR_PREGUNTA);
+  }
+
+  const ultimo = historial[historial.length - 1];
+  const acerto = respondida && seleccion === pregunta.correcta;
+  let aviso = '';
+  if (respondida) {
+    if (seleccion === TIEMPO_AGOTADO) aviso = 'Se acabó el tiempo';
+    else if (acerto) aviso = `¡Correcto! +${ultimo ? ultimo.puntos : 0}`;
+    else aviso = 'Incorrecto';
   }
 
   const restantes = Math.max(segundos, 0);
@@ -88,6 +112,28 @@ export default function PantallaJuego({ onTerminar }) {
       <Pregunta pregunta={pregunta} seleccion={seleccion} onResponder={responder} />
 
       {respondida && (
+        <Animated.View
+          style={[
+            styles.aviso,
+            acerto ? styles.avisoBien : styles.avisoMal,
+            {
+              opacity: aparicion,
+              transform: [
+                {
+                  scale: aparicion.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.6, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <Text style={styles.textoAviso}>{aviso}</Text>
+        </Animated.View>
+      )}
+
+      {respondida && (
         <Pressable style={styles.siguiente} onPress={siguiente}>
           <Text style={styles.textoSiguiente}>
             {esUltima ? 'Ver resultados' : 'Siguiente'}
@@ -113,6 +159,10 @@ const styles = StyleSheet.create({
   barraUrgente: { backgroundColor: COLORES.rojoIbero },
   segundos: { fontSize: 15, color: COLORES.textoSuave },
   segundosUrgentes: { color: COLORES.rojoIbero, fontWeight: 'bold' },
+  aviso: { padding: 14, borderRadius: 12, alignItems: 'center' },
+  avisoBien: { backgroundColor: COLORES.verde },
+  avisoMal: { backgroundColor: COLORES.rojoIbero },
+  textoAviso: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
   siguiente: {
     backgroundColor: COLORES.texto,
     padding: 16,

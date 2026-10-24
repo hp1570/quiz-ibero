@@ -1,7 +1,8 @@
 // Una pregunta con sus 4 respuestas (checkpoint 2).
 // Conceptos: composición (Pregunta usa BotonRespuesta), listas con map y key.
+// CP5: la sombra de la tarjeta se define distinto en cada plataforma con Platform.select.
 
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Platform, StyleSheet } from 'react-native';
 import BotonRespuesta from './BotonRespuesta';
 import { COLORES, COLORES_OPCIONES } from '../theme';
 
@@ -36,6 +37,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     gap: 10,
+    // iOS dibuja sombras con shadow*; Android usa elevation (Material Design).
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000000',
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: { elevation: 4 },
+    }),
   },
   enunciado: {
     fontSize: 20,
