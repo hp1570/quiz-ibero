@@ -1,10 +1,20 @@
-// Pantalla de inicio (checkpoint 1).
-// Conceptos: componentes nativos (View, Text, Pressable), StyleSheet y Flexbox.
+// Pantalla de inicio.
+// CP1: componentes nativos (View, Text, Pressable), StyleSheet y Flexbox.
+// CP6: muestra el récord guardado con SecureStore.
 
+import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { leerRecord } from '../storage/record';
 import { COLORES, COLORES_OPCIONES } from '../theme';
 
 export default function PantallaInicio({ totalPreguntas, onJugar }) {
+  const [record, setRecord] = useState(null);
+
+  // Lee el récord una vez, cuando la pantalla aparece.
+  useEffect(() => {
+    leerRecord().then(setRecord);
+  }, []);
+
   return (
     <View style={styles.contenedor}>
       <Text style={styles.titulo}>QuizIbero</Text>
@@ -17,6 +27,10 @@ export default function PantallaInicio({ totalPreguntas, onJugar }) {
           <View key={color} style={[styles.caja, { backgroundColor: color }]} />
         ))}
       </View>
+
+      <Text style={styles.record}>
+        {record ? `Récord: ${record.puntaje} pts` : 'Todavía no hay récord'}
+      </Text>
 
       <Pressable
         style={({ pressed }) => [styles.boton, pressed && styles.presionado]}
@@ -39,6 +53,7 @@ const styles = StyleSheet.create({
   titulo: { fontSize: 40, fontWeight: 'bold', color: COLORES.rojoIbero },
   subtitulo: { fontSize: 16, marginTop: 8, color: COLORES.texto },
   fila: { flexDirection: 'row', marginVertical: 32, gap: 12 },
+  record: { fontSize: 16, color: COLORES.textoSuave, marginBottom: 24 },
   caja: { width: 48, height: 48, borderRadius: 8 },
   boton: {
     backgroundColor: COLORES.rojoIbero,
