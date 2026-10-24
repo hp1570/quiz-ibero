@@ -1,11 +1,18 @@
 // Pantalla de inicio.
 // CP1: componentes nativos (View, Text, Pressable), StyleSheet y Flexbox.
 // CP6: muestra el récord guardado con SecureStore.
+// CP7: indica en qué plataforma corre (el mismo código en Android y en iOS).
 
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Platform, StyleSheet } from 'react-native';
 import { leerRecord } from '../storage/record';
 import { COLORES, COLORES_OPCIONES } from '../theme';
+
+const NOMBRE_PLATAFORMA = Platform.select({
+  ios: 'iOS',
+  android: 'Android',
+  default: Platform.OS,
+});
 
 export default function PantallaInicio({ totalPreguntas, onJugar }) {
   const [record, setRecord] = useState(null);
@@ -38,6 +45,10 @@ export default function PantallaInicio({ totalPreguntas, onJugar }) {
       >
         <Text style={styles.textoBoton}>Jugar</Text>
       </Pressable>
+
+      <Text style={styles.plataforma}>
+        Corriendo en {NOMBRE_PLATAFORMA} {Platform.Version}
+      </Text>
     </View>
   );
 }
@@ -63,4 +74,5 @@ const styles = StyleSheet.create({
   },
   presionado: { opacity: 0.8 },
   textoBoton: { color: '#FFFFFF', fontSize: 20, fontWeight: 'bold' },
+  plataforma: { marginTop: 32, fontSize: 13, color: COLORES.textoSuave },
 });
