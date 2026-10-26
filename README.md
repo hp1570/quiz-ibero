@@ -84,24 +84,10 @@ npm install
 
 **Ojo con OneDrive:** esta carpeta está dentro de OneDrive. `npm install` crea `node_modules` con miles de archivos y OneDrive intentará sincronizarlos todos. Pausa la sincronización mientras trabajas o mueve el proyecto a una carpeta fuera de OneDrive, por ejemplo `C:\dev\quiz-ibero`. `node_modules` nunca se sube a GitHub; ya está en `.gitignore`.
 
-## Subir a GitHub (una sola vez, Hernán)
-
-El repositorio local ya tiene todas las ramas y commits. Solo falta conectarlo:
-
-1. En github.com, crea un repositorio **vacío** llamado `quiz-ibero`, sin README ni .gitignore.
-2. En la terminal:
+## Clonar el proyecto
 
 ```bash
-git remote add origin https://github.com/<tu-usuario>/quiz-ibero.git
-git push -u origin --all
-```
-
-3. En GitHub → Settings → Collaborators, agrega a Sebas.
-
-Sebas, en su computadora:
-
-```bash
-git clone https://github.com/<usuario-de-hernan>/quiz-ibero.git
+git clone https://github.com/hp1570/quiz-ibero.git
 cd quiz-ibero
 npm install
 ```
@@ -151,19 +137,52 @@ npx expo start
 
 6. Presiona `a`. La app se abre en el celular conectado; debe tener Expo Go instalado.
 
-### Opción 4. iPhone por Wi-Fi (sin Mac)
+### Opción 4. iPhone (desde Windows o Mac, sin Xcode)
 
-Con Expo Go se puede correr la app en un iPhone real desde Windows, sin Xcode.
+Con Expo Go se puede correr la app en un iPhone real, incluso desde Windows. En iOS, Expo Go **exige iniciar sesión con la misma cuenta de Expo** en el iPhone y en la terminal.
 
-1. En el iPhone, instala **Expo Go** desde la App Store.
-2. Crea una cuenta gratuita en expo.dev. Inicia sesión en la laptop:
+1. En el iPhone, instala **Expo Go** desde la App Store. Debe ser la versión 58 o una que soporte el SDK 58.
+2. Crea una cuenta gratuita en [expo.dev](https://expo.dev/signup). Anota tu **usuario y contraseña**. Si la creaste con Google, GitHub o Apple, no tiene contraseña: ponle una con "Forgot password" en expo.dev.
+3. En Expo Go, toca el ícono de cuenta (arriba a la derecha) e inicia sesión.
+4. En la terminal, con el servidor detenido (**Ctrl + C**), inicia sesión **sin navegador**:
 
 ```bash
-npx expo login
+npx expo login --no-browser
 ```
 
-3. En Expo Go del iPhone, inicia sesión **con la misma cuenta**. En iOS, el proyecto solo abre si los dos tienen sesión con la misma cuenta.
-4. Laptop y iPhone en la misma red. Corre `npx expo start` y escanea el QR con la **cámara** del iPhone, o abre el proyecto desde la lista de Expo Go.
+   Escribe tu usuario y tu contraseña. Si tienes verificación en dos pasos, también te pide el código.
+
+5. Comprueba que la terminal y Expo Go usan la misma cuenta:
+
+```bash
+npx expo whoami
+```
+
+6. Arranca el servidor **de nuevo** (Expo lee la cuenta solo al iniciar), con la laptop y el iPhone en la misma red:
+
+```bash
+npx expo start
+```
+
+7. Escanea el QR con la **cámara** del iPhone, o abre el proyecto desde la lista de Expo Go.
+
+**Por qué `--no-browser`:** `npx expo login` intenta abrir el navegador. En Windows ese paso puede fallar con `Error: C:\Windows\System32\cmd.exe /c start "" https://expo.dev/login?... exited with non-zero code: 1`, y el login se cancela. Con `--no-browser` el login se hace en la misma terminal y funciona igual en Windows y en Mac.
+
+#### Problemas frecuentes en iPhone
+
+| Síntoma | Causa | Solución |
+| --- | --- | --- |
+| `Error: ...cmd.exe /c start ... exited with non-zero code: 1` al ejecutar `npx expo login` | Windows no pudo abrir el navegador | `npx expo login --no-browser` |
+| `You're signed in to Expo Go as "X", but not signed in to Expo CLI` | Falta iniciar sesión en la terminal | `npx expo login --no-browser` con la cuenta "X" y volver a correr `npx expo start` |
+| "You need to be signed in to Expo Go and Expo CLI to open your project" | Falta sesión en uno de los dos, o son cuentas distintas | Revisa con `npx expo whoami`; si no coincide, `npx expo logout` y vuelve a iniciar sesión con la cuenta de Expo Go |
+| Iniciaste sesión pero el error sigue | El servidor arrancó antes del login | **Ctrl + C** y `npx expo start` otra vez; en el iPhone, **Try Again** |
+| El login dice que la contraseña es incorrecta y nunca pusiste una | La cuenta se creó con Google, GitHub o Apple | Ponle contraseña con "Forgot password" en expo.dev |
+| Te pide un código | Tienes verificación en dos pasos | Escribe el código de tu app de autenticación (o usa `--otp <código>`) |
+| "Project is incompatible with this version of Expo Go" | Expo Go y el proyecto tienen SDK distinto | Actualiza Expo Go desde la App Store; en iPhone no se pueden instalar versiones anteriores |
+| El QR abre Expo Go pero se queda cargando o "Could not connect to development server" | La red bloquea la conexión entre laptop e iPhone | `npx expo start --tunnel` o el hotspot del iPhone |
+| La cámara no reconoce el QR | El QR es muy pequeño o la cámara no detecta enlaces `exp://` | Abre el proyecto desde la lista de Expo Go (aparece al tener sesión) |
+| Windows pregunta si Node.js puede usar la red | Firewall de Windows | Permite el acceso en redes privadas |
+| El botón "Ver récord con huella" no aparece | Face ID no funciona en Expo Go | Es esperado; la demo de biometría es solo en Android |
 
 ### Opción 5. Cuando la red de la universidad no deja conectar
 
@@ -186,7 +205,7 @@ Para iPhone no hay opción por cable desde Windows con Expo Go: usa Wi-Fi, túne
 | --- | --- | --- |
 | Expo Go dice que el proyecto es incompatible con su versión | La versión de Expo Go no coincide con el SDK 58 | Actualiza Expo Go desde la tienda |
 | El QR abre pero se queda cargando o "Could not connect" | Laptop y celular en redes distintas, o firewall | `npx expo start --tunnel` o el hotspot del celular |
-| En iPhone no aparece el proyecto | Sesiones de Expo distintas | Misma cuenta en `npx expo login` y en Expo Go |
+| En iPhone no abre el proyecto | Falta sesión o son cuentas distintas | Ver "Problemas frecuentes en iPhone" (Opción 4) |
 | `adb` no se reconoce | No está en el PATH | Usa la ruta completa de `platform-tools\adb.exe` |
 | `adb devices` muestra `unauthorized` | No se aceptó el aviso en el celular | Desconecta, vuelve a conectar y acepta |
 | Un cambio no aparece en la app | Fast Refresh no alcanzó a recargar | Presiona `r` en la terminal |
